@@ -1,0 +1,120 @@
+# WT Segmentation — Config B
+# U-Net + DenseNet-201, 512×512 patches at 0.5 µm, masks at 2.0 µm, Lovász loss.
+# 16 classes (0=background … 15=urothelium); Fibrose merged into Regressie (6).
+#
+# label_dist: normalised sampling probabilities derived from 1/sqrt(polygon_count).
+#   See src/wt_segmentation/labels.py — LABEL_DIST section for derivation.
+#   IMPORTANT: after first rasterisation run:
+#       python3 scripts/make_splits.py ... --recompute_weights
+#   and replace the label_dist below with pixel-count-based values.
+
+model:
+    modelname: 'unet'
+    backbone: 'densenet201'
+    encoder_weights: 'imagenet'
+    loss: 'lovasz'
+    learning_rate: 0.0001
+    learning_rate_schedule: 'plateau'
+
+sampler:
+    training:
+        iterations: 5000
+        sampler_count: 16
+        label_mode: 'central'
+        patch_shapes:
+            0.5: [512, 512]         # image read spacing in µm
+        mask_spacing: 2.0           # mask rasterised at 2.0 µm (different from patch spacing)
+        label_map:
+            # Identity mapping — mask integers are already contiguous 0..15.
+            # class_index: mask_int  →  English name
+            0:  0   # background
+            1:  1   # wt_blastema
+            2:  2   # wt_stroma
+            3:  3   # wt_epithelium
+            4:  4   # necrosis
+            5:  5   # bleeding
+            6:  6   # regression  (Fibrose merged here at rasterisation)
+            7:  7   # glomeruli
+            8:  8   # tubules
+            9:  9   # nephrogenic_rest
+            10: 10  # fat
+            11: 11  # connective_tissue
+            12: 12  # blood_vessels
+            13: 13  # nerves
+            14: 14  # lymph_nodes
+            15: 15  # urothelium
+        label_dist:
+            # Normalised 1/sqrt(polygon_count) weights; sum=1.0.
+            # Source: PROJECT_REPORT.md §2.2 polygon counts.
+            # Background overridden to 0.020 (polygon count underestimates pixel area).
+            0:  0.0200   # background          ( 90 polygons — manual override)
+            1:  0.0494   # wt_blastema         (441)
+            2:  0.0557   # wt_stroma           (349)
+            3:  0.0392   # wt_epithelium       (704)
+            4:  0.0688   # necrosis            (229)
+            5:  0.0656   # bleeding            (251)
+            6:  0.0465   # regression+fibrosis (500)
+            7:  0.0440   # glomeruli           (557)
+            8:  0.0458   # tubules             (515)
+            9:  0.0847   # nephrogenic_rest    (151)
+            10: 0.0603   # fat                 (298)
+            11: 0.0441   # connective_tissue   (556)
+            12: 0.0339   # blood_vessels       (944)
+            13: 0.0838   # nerves              (154)
+            14: 0.1365   # lymph_nodes         ( 58)
+            15: 0.1217   # urothelium          ( 73)
+        seed: 42
+
+    validation:
+        iterations: 500
+        sampler_count: 8
+        label_mode: 'central'
+        patch_shapes:
+            0.5: [512, 512]
+        mask_spacing: 2.0
+        label_map:
+            0:  0
+            1:  1
+            2:  2
+            3:  3
+            4:  4
+            5:  5
+            6:  6
+            7:  7
+            8:  8
+            9:  9
+            10: 10
+            11: 11
+            12: 12
+            13: 13
+            14: 14
+            15: 15
+        label_dist:
+            # Uniform weights for validation (no oversampling bias).
+            0:  1.0
+            1:  1.0
+            2:  1.0
+            3:  1.0
+            4:  1.0
+            5:  1.0
+            6:  1.0
+            7:  1.0
+            8:  1.0
+            9:  1.0
+            10: 1.0
+            11: 1.0
+            12: 1.0
+            13: 1.0
+            14: 1.0
+            15: 1.0
+        seed: 42
+
+training:
+    training_batch_size: 8
+    validation_batch_size: 8
+    epochs: 100
+    stop_plateau: 20        # early-stop patience (epochs without val improvement)
+    lr_plateau: 5           # halve LR after this many stagnant epochs (matches thesis)
+    lr_reduction_factor: 0.5
+    workers: 4
+    mixed_precision: true

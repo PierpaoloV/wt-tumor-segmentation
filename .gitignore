@@ -1,0 +1,41 @@
+# Data — never commit masks, weights, or raw images
+*.tif
+*.tiff
+*.svs
+*.ndpi
+*.mrxs
+*.pt
+*.pth
+*.ckpt
+*.h5
+
+# Annotations and thesis — stay on the Samba share / local disk
+annotations/
+ludovanalst_masterthesis_wilmstumours_final_version_compressed.pdf
+
+# Meta files not for the repo
+CLAUDE.md
+research_log.md
+network_configuration.yaml       # replaced by configs/wt_network_configuration.yaml
+
+# WandB and experiment logs (keep results/ but not raw wandb artifacts)
+wandb/
+*.wandb
+
+# Secrets
+.env
+*.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+*.egg
+
+# OS
+.DS_Store
+Thumbs.db

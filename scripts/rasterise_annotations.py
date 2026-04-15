@@ -98,14 +98,15 @@ def rasterise_one(
 
     try:
         create_annotation_mask(
-            annotation_path=str(xml_path),
-            image_path=str(image_path),
-            mask_path=str(mask_path),
-            labels=labels_dict,
-            order=order,
-            spacing=spacing,
-            empty=EMPTY_VALUE,
-            workers=1,      # parallelism is at the slide level
+            image=str(image_path),
+            annotation=str(xml_path),
+            label_map=labels_dict,
+            conversion_order=order,
+            conversion_spacing=spacing,
+            spacing_tolerance=0.25,
+            output_path=str(mask_path),
+            strict=False,
+            accept_all_empty=True,
         )
     except Exception as exc:
         log.error("Failed to rasterise %s: %s", stem, exc)
@@ -142,7 +143,7 @@ def _read_present_labels(mask_path: Path) -> set[int]:
                             height=dims[0], width=dims[1])
         reader.close()
         unique = set(np.unique(patch).tolist())
-        unique.discard(EMPTY_VALUE)
+        unique.discard(EMPTY_VALUE)  # 0 = unannotated fill, not a supervised class
         return unique
     except Exception as exc:
         log.warning("Could not read back %s to verify labels: %s", mask_path, exc)

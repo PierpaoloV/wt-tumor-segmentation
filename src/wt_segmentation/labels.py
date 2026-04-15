@@ -52,7 +52,7 @@ _CLASSES: List[Tuple[str, str, int]] = [
     ("Urotheel",       "urothelium",         15),
 ]
 
-EMPTY_VALUE: int = 255  # pixel value for unannotated regions
+EMPTY_VALUE: int = 0  # create_annotation_mask fills unannotated pixels with 0 (not configurable)
 
 # ---------------------------------------------------------------------------
 # Derived look-ups
@@ -112,22 +112,27 @@ ORDER: List[str] = [
 # (scripts/make_splits.py --recompute-weights).
 # ---------------------------------------------------------------------------
 LABEL_DIST: Dict[int, float] = {
-    0:  0.0200,   # background          (90 polygons — manual override)
-    1:  0.0494,   # wt_blastema         (441)
-    2:  0.0557,   # wt_stroma           (349)
-    3:  0.0392,   # wt_epithelium       (704)
-    4:  0.0688,   # necrosis            (229)
-    5:  0.0656,   # bleeding            (251)
-    6:  0.0465,   # regression+fibrosis (500)
-    7:  0.0440,   # glomeruli           (557)
-    8:  0.0458,   # tubules             (515)
-    9:  0.0847,   # nephrogenic_rest    (151)
-    10: 0.0603,   # fat                 (298)
-    11: 0.0441,   # connective_tissue   (556)
-    12: 0.0339,   # blood_vessels       (944)
-    13: 0.0838,   # nerves              (154)
-    14: 0.1365,   # lymph_nodes         (58)
-    15: 0.1217,   # urothelium          (73)
+    # NOTE: class 0 (background) is intentionally excluded.
+    # create_annotation_mask fills unannotated pixels with 0, so including 0
+    # here would train the model to predict background on ALL unannotated regions
+    # in sparse slides — which is incorrect. Pixels with value 0 are therefore
+    # treated as ignore_index by the sampler (not in label_dist keys → -100).
+    # Background can still be predicted at inference since it remains in label_map.
+    1:  0.050408,  # wt_blastema         (441)
+    2:  0.056837,  # wt_stroma           (349)
+    3:  0.040000,  # wt_epithelium       (704)
+    4:  0.070204,  # necrosis            (229)
+    5:  0.066939,  # bleeding            (251)
+    6:  0.047449,  # regression+fibrosis (500)
+    7:  0.044898,  # glomeruli           (557)
+    8:  0.046735,  # tubules             (515)
+    9:  0.086429,  # nephrogenic_rest    (151)
+    10: 0.061531,  # fat                 (298)
+    11: 0.045000,  # connective_tissue   (556)
+    12: 0.034592,  # blood_vessels       (944)
+    13: 0.085510,  # nerves              (154)
+    14: 0.139286,  # lymph_nodes         (58)
+    15: 0.124184,  # urothelium          (73)
 }
 
 # Identity label_map: mask int == class index (0..15 are already contiguous)

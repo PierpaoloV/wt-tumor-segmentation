@@ -46,23 +46,25 @@ sampler:
         label_dist:
             # Normalised 1/sqrt(polygon_count) weights; sum=1.0.
             # Source: PROJECT_REPORT.md §2.2 polygon counts.
-            # Background overridden to 0.020 (polygon count underestimates pixel area).
-            0:  0.0200   # background          ( 90 polygons — manual override)
-            1:  0.0494   # wt_blastema         (441)
-            2:  0.0557   # wt_stroma           (349)
-            3:  0.0392   # wt_epithelium       (704)
-            4:  0.0688   # necrosis            (229)
-            5:  0.0656   # bleeding            (251)
-            6:  0.0465   # regression+fibrosis (500)
-            7:  0.0440   # glomeruli           (557)
-            8:  0.0458   # tubules             (515)
-            9:  0.0847   # nephrogenic_rest    (151)
-            10: 0.0603   # fat                 (298)
-            11: 0.0441   # connective_tissue   (556)
-            12: 0.0339   # blood_vessels       (944)
-            13: 0.0838   # nerves              (154)
-            14: 0.1365   # lymph_nodes         ( 58)
-            15: 0.1217   # urothelium          ( 73)
+            # Class 0 (background) is EXCLUDED: create_annotation_mask fills unannotated
+            # pixels with 0, so including 0 would train on all unannotated regions in
+            # sparse slides. Pixels with value 0 are treated as ignore_index instead.
+            # REGENERATE from pixel histograms after rasterisation (make_splits.py --recompute_weights).
+            1:  0.050408  # wt_blastema         (441)
+            2:  0.056837  # wt_stroma           (349)
+            3:  0.040000  # wt_epithelium       (704)
+            4:  0.070204  # necrosis            (229)
+            5:  0.066939  # bleeding            (251)
+            6:  0.047449  # regression+fibrosis (500)
+            7:  0.044898  # glomeruli           (557)
+            8:  0.046735  # tubules             (515)
+            9:  0.086429  # nephrogenic_rest    (151)
+            10: 0.061531  # fat                 (298)
+            11: 0.045000  # connective_tissue   (556)
+            12: 0.034592  # blood_vessels       (944)
+            13: 0.085510  # nerves              (154)
+            14: 0.139286  # lymph_nodes         ( 58)
+            15: 0.124184  # urothelium          ( 73)
         seed: 42
 
     validation:
@@ -91,7 +93,7 @@ sampler:
             15: 15
         label_dist:
             # Uniform weights for validation (no oversampling bias).
-            0:  1.0
+            # Class 0 excluded for the same reason as training (fill=0 = unannotated).
             1:  1.0
             2:  1.0
             3:  1.0

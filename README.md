@@ -2,8 +2,6 @@
 
 Pixel-level segmentation of Wilms' tumour (nephroblastoma) histopathology whole-slide images. This repository contains the training configuration, annotation rasterisation scripts, and data split utilities for retraining the [pathology-segmentation-pipeline](https://github.com/DIAGNijmegen/pathology-segmentation-pipeline) on a 61-patient cohort annotated at the Princess Máxima Center, Utrecht.
 
-The work reproduces and extends the methodology of van Alst (2021), targeting the thesis best result of F1 = 0.850 achieved with a DenseNet-201 encoder.
-
 ---
 
 ## Repository structure

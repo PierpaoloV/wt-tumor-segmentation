@@ -57,7 +57,7 @@ PATIENT_RE = re.compile(r"(P\d{6})", re.IGNORECASE)
 
 
 def extract_patient_id(stem: str) -> str | None:
-    m = PATIENT_RE.match(stem)
+    m = PATIENT_RE.search(stem)
     return m.group(1).upper() if m else None
 
 

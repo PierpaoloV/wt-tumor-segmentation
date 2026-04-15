@@ -1,27 +1,30 @@
 # Albumentations augmentation pipeline for WT segmentation.
-# Uses only stable parameters compatible with albumentations >= 1.0.
+# Compatible with albumentations==1.3.1 (signatures verified).
 
 __version__: 1.3.1
 transform:
     __class_fullname__: Compose
-    additional_targets: {}
     bbox_params: null
-    is_check_args: true
-    is_check_shapes: false
     keypoint_params: null
+    additional_targets: {}
     p: 1.0
+    is_check_shapes: false
     transforms:
         # --- Spatial ---
         - __class_fullname__: HorizontalFlip
+          always_apply: false
           p: 0.5
 
         - __class_fullname__: VerticalFlip
+          always_apply: false
           p: 0.5
 
         - __class_fullname__: RandomRotate90
+          always_apply: false
           p: 0.5
 
         - __class_fullname__: Transpose
+          always_apply: false
           p: 0.5
 
         - __class_fullname__: ElasticTransform
@@ -33,6 +36,8 @@ transform:
           value: null
           mask_value: null
           approximate: false
+          same_dxdy: false
+          always_apply: false
           p: 0.3
 
         - __class_fullname__: ShiftScaleRotate
@@ -43,24 +48,29 @@ transform:
           border_mode: 4
           value: null
           mask_value: null
+          always_apply: false
           p: 0.4
 
         # --- Colour ---
         - __class_fullname__: RandomBrightnessContrast
           brightness_limit: 0.2
           contrast_limit: 0.2
+          brightness_by_max: true
+          always_apply: false
           p: 0.5
 
         - __class_fullname__: HueSaturationValue
           hue_shift_limit: 10
           sat_shift_limit: 20
           val_shift_limit: 10
+          always_apply: false
           p: 0.3
 
         - __class_fullname__: RGBShift
           r_shift_limit: 15
           g_shift_limit: 15
           b_shift_limit: 15
+          always_apply: false
           p: 0.3
 
         # --- Noise ---
@@ -69,8 +79,11 @@ transform:
               - 5.0
               - 30.0
           mean: 0
+          per_channel: true
+          always_apply: false
           p: 0.3
 
         - __class_fullname__: Blur
           blur_limit: 3
+          always_apply: false
           p: 0.1

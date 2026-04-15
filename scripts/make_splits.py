@@ -51,8 +51,9 @@ from wt_segmentation.labels import (
     recompute_label_dist,
 )
 
-# Patient ID pattern: P followed by 6 digits at the start of the filename.
-PATIENT_RE = re.compile(r"^(P\d{6})", re.IGNORECASE)
+# Patient ID pattern: P followed by 6 digits anywhere in the filename.
+# Stems look like WT_S01_P000001_C0001_B107, so ^ would never match.
+PATIENT_RE = re.compile(r"(P\d{6})", re.IGNORECASE)
 
 
 def extract_patient_id(stem: str) -> str | None:
@@ -125,8 +126,8 @@ def assert_split_integrity(
     def patient_ids_from(slides: list[dict]) -> set[str]:
         ids = set()
         for s in slides:
-            stem = Path(s["image"]).stem
-            pid = extract_patient_id(stem)
+            # Search in the full image path, not just the stem, for robustness
+            pid = extract_patient_id(s["image"])
             if pid:
                 ids.add(pid)
         return ids
@@ -224,8 +225,10 @@ def main() -> None:
         help="Fraction of patients for validation (default: 0.15).",
     )
     parser.add_argument(
-        "--seed", type=int, default=42,
-        help="Random seed for reproducibility (default: 42).",
+        "--seed", type=int, default=2,
+        help="Random seed for reproducibility (default: 2). "
+             "Seed 2 is the lowest seed that produces a valid split with all "
+             "15 classes present in every fold for this 61-patient cohort.",
     )
     parser.add_argument(
         "--recompute_weights", action="store_true",

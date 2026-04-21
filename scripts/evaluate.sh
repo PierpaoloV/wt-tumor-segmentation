@@ -33,15 +33,15 @@ echo "==> Evaluating run: ${RUN_NAME}"
 CLASSES_JSON=$(python3 -c "
 import sys; sys.path.insert(0, '${PROJECT_ROOT}/src')
 from wt_segmentation.labels import INT_TO_ENGLISH
-import json
-print(json.dumps({v: k for k, v in INT_TO_ENGLISH.items()}))
+# Exclude background (0): awesomedice assumes 1-indexed classes; including 0 shifts the entire CM by one
+print('{' + ','.join(f'\"{k}\":{v}' for v, k in INT_TO_ENGLISH.items() if v != 0) + '}')
 ")
 
 MAPPING_JSON=$(python3 -c "
 import sys; sys.path.insert(0, '${PROJECT_ROOT}/src')
 from wt_segmentation.labels import LABEL_MAP
-import json
-print(json.dumps({str(k): v for k, v in LABEL_MAP.items()}))
+# Exclude 0 from mapping so mapping_set=[1..15]; background pixels are excluded by awesomedice's gt!=0 filter
+print('{' + ','.join(f'{k}:{v}' for k, v in LABEL_MAP.items() if k != 0) + '}')
 ")
 
 echo "==> Classes: ${CLASSES_JSON}"
@@ -54,7 +54,7 @@ docker run --gpus all --rm \
     "${WT_IMAGE}" \
     python3 /home/user/source/code/awesomedice.py \
         --input_mask_path  "/home/user/process/${RUN_NAME}/predictions/*.tif" \
-        --ground_truth_path "/home/user/data/masks/{image}.tif" \
+        --ground_truth_path "/home/user/data/wt_masks/{image}.tif" \
         --classes          "${CLASSES_JSON}" \
         --mapping          "${MAPPING_JSON}" \
         --spacing          2.0 \

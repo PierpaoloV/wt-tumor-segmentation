@@ -10,11 +10,12 @@
 
 model:
     modelname: 'unet'
-    backbone: 'densenet201'
+    backbone: 'efficientnet-b3'
     encoder_weights: 'imagenet'
     loss: 'lovasz'
     learning_rate: 0.0001
     learning_rate_schedule: 'plateau'
+    weight_decay: 0.0001
 
 sampler:
     training:
@@ -116,7 +117,7 @@ training:
     validation_batch_size: 8
     epochs: 100
     stop_plateau: 20        # early-stop patience (epochs without val improvement)
-    lr_plateau: 5           # halve LR after this many stagnant epochs (matches thesis)
+    lr_plateau: 10          # halve LR after this many stagnant epochs (5 was too aggressive in Run 2)
     lr_reduction_factor: 0.5
     workers: 4
     mixed_precision: true

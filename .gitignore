@@ -11,12 +11,30 @@
 
 # Annotations and thesis — stay on the Samba share / local disk
 annotations/
-ludovanalst_masterthesis_wilmstumours_final_version_compressed.pdf
+*.pdf
+
+# Archives
+*.tar
+*.tar.gz
+*.zip
+
+# Ad-hoc plots and score dumps in root
+*.png
+scores_*.yaml
+wt_test.yaml
+
+# Ad-hoc root-level scripts
+generate_collaborator_report.py
+
+# Generated data directories
+wt_masks/
+wt_prediction/
 
 # Meta files not for the repo
 CLAUDE.md
 research_log.md
 network_configuration.yaml       # replaced by configs/wt_network_configuration.yaml
+wt_network_configuration.yaml   # stale root-level copy, canonical is configs/wt_network_configuration.yaml
 
 # WandB and experiment logs (keep results/ but not raw wandb artifacts)
 wandb/

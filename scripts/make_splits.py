@@ -310,7 +310,8 @@ def main() -> None:
 
     # Emit wt_test.yaml
     test_yaml = {
-        "data": {"default": test_slides},
+        "data": {"default": {"default": test_slides}},
+        "distribution": {"default": 1.0},
         "path": {
             "images": "images",
             "masks":  "masks",
